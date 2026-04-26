@@ -1205,25 +1205,39 @@ function drawCosmos(t){
 drawCosmos(0);
 
 // ── SCROLL REVEAL
-const observer = new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){ e.target.classList.add('visible'); }
-  });
-},{threshold:0.1});
-
-document.querySelectorAll('.reveal,.project-card,.tl-item').forEach(el=>{
-  el.style.transitionDelay = el.dataset.delay||'0s';
-  observer.observe(el);
-});
-
-// Stagger project cards
+// Set stagger delays FIRST before observing
 document.querySelectorAll('.project-card').forEach((el,i)=>{
   el.style.transitionDelay = `${i*0.08}s`;
 });
-
-// Stagger timeline items
 document.querySelectorAll('.tl-item').forEach((el,i)=>{
   el.style.transitionDelay = `${i*0.1}s`;
+});
+
+const revealEls = document.querySelectorAll('.reveal, .project-card, .tl-item');
+
+function makeVisible(el){ el.classList.add('visible'); }
+
+// Robust observer: low threshold + rootMargin so it fires early
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      makeVisible(e.target);
+      observer.unobserve(e.target);
+    }
+  });
+},{ threshold: 0, rootMargin: '0px 0px -60px 0px' });
+
+revealEls.forEach(el => observer.observe(el));
+
+// Hard fallback: if anything is still invisible after 2s, force show it
+setTimeout(()=>{ revealEls.forEach(makeVisible); }, 2000);
+
+// Also reveal anything already in viewport on load
+window.addEventListener('load', ()=>{
+  revealEls.forEach(el=>{
+    const rect = el.getBoundingClientRect();
+    if(rect.top < window.innerHeight) makeVisible(el);
+  });
 });
 </script>
 </body>

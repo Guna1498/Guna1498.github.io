@@ -347,11 +347,7 @@ h2.section-title em {
   position: relative;
   margin-bottom: 32px;
   padding-left: 20px;
-  opacity: 0;
-  transform: translateX(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
 }
-.tl-item.visible { opacity:1; transform:translateX(0); }
 .tl-dot {
   position:absolute; left:-28px; top:5px;
   width:8px; height:8px;
@@ -395,10 +391,7 @@ h2.section-title em {
   position: relative;
   overflow: hidden;
   transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
-  opacity: 0;
-  transform: translateY(30px);
 }
-.project-card.visible { opacity:1; transform:translateY(0); }
 
 .project-card::before {
   content:'';
@@ -654,15 +647,7 @@ footer {
 .footer-right span { color: var(--teal); }
 
 /* ── SCROLL REVEAL ── */
-.reveal {
-  opacity:0;
-  transform: translateY(24px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.reveal.visible {
-  opacity:1;
-  transform: translateY(0);
-}
+.reveal { opacity:1; }
 
 /* ── TOKEN ANIMATION (hero decoration) ── */
 .token-stream {
@@ -1204,41 +1189,7 @@ function drawCosmos(t){
 }
 drawCosmos(0);
 
-// ── SCROLL REVEAL
-// Set stagger delays FIRST before observing
-document.querySelectorAll('.project-card').forEach((el,i)=>{
-  el.style.transitionDelay = `${i*0.08}s`;
-});
-document.querySelectorAll('.tl-item').forEach((el,i)=>{
-  el.style.transitionDelay = `${i*0.1}s`;
-});
 
-const revealEls = document.querySelectorAll('.reveal, .project-card, .tl-item');
-
-function makeVisible(el){ el.classList.add('visible'); }
-
-// Robust observer: low threshold + rootMargin so it fires early
-const observer = new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      makeVisible(e.target);
-      observer.unobserve(e.target);
-    }
-  });
-},{ threshold: 0, rootMargin: '0px 0px -60px 0px' });
-
-revealEls.forEach(el => observer.observe(el));
-
-// Hard fallback: if anything is still invisible after 2s, force show it
-setTimeout(()=>{ revealEls.forEach(makeVisible); }, 2000);
-
-// Also reveal anything already in viewport on load
-window.addEventListener('load', ()=>{
-  revealEls.forEach(el=>{
-    const rect = el.getBoundingClientRect();
-    if(rect.top < window.innerHeight) makeVisible(el);
-  });
-});
 </script>
 </body>
 </html>
